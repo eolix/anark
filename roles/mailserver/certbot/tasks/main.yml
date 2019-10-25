@@ -1,0 +1,40 @@
+---
+- name: Install Certbot packages
+  apt: pkg={{ item }} state=installed
+  with_items:
+    - certbot
+
+- name: Check if certificate already exists
+  stat:
+    path: /etc/letsencrypt/live/{{ mail_domain }}/cert.pem
+  register: letsencrypt_cert
+
+- block:
+  - name: Stop web services
+    service:
+      name: "{{ item }}"
+      state: stopped
+    loop:
+      - nginx
+      - apache
+    ignore_errors: yes
+
+  - name: Run Certbot to generate all required SSL certificates
+    command: "certbot certonly --standalone --rsa-key-size 4096 -d {{ mail_domain }} -d www.{{ mail_domain }} -d mail.{{ mail_domain }} -d smtp.{{ mail_domain }} -d imap.{{ mail_domain }} --non-interactive --agree-tos -m {{ mail_user }}@{{ mail_domain }}"
+
+  - name: Restart web services
+    service:
+      name: "{{ item }}"
+      state: restarted
+    loop:
+      - nginx
+      - apache
+    ignore_errors: yes
+  when: (not letsencrypt_cert.stat.exists) or ( force_certbot | default('false')  == 'true')
+
+- name: Add Certbot to crontab to renew SSL certificates weekly
+  cron:
+    name: certbot
+    job: certbot renew --pre-hook "systemctl stop nginx" --post-hook "systemctl start nginx" --renew-hook "systemctl reload nginx; systemctl reload dovecot; systemctl reload postfix" --quiet
+    state: present
+    special_time: weekly

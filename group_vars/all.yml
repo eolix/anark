@@ -1,0 +1,7 @@
+---
+mail_domain: mydomain.tld # the 'mail' subdomain will be added throughout the playbook - don't add it here.
+mail_user: info # the main e-mail account. Postmaster will be aliased to this account
+mail_password: 
+mail_quota: 20480 # amount of available disk space for the main e-mail account
+
+secretpath: '{{ inventory_dir | realpath + "/secret" }}'

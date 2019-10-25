@@ -1,0 +1,13 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+ansible = ">=2.8.1"
+jmespath = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.7"
