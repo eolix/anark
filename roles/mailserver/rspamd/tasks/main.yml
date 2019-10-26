@@ -1,0 +1,93 @@
+---
+- name: Add rspamd repository key
+  apt_key:
+    url: https://rspamd.com/apt-stable/gpg.key
+    state: present
+
+- name: Add rspamd repositories
+  lineinfile:
+    path: /etc/apt/sources.list.d/rspamd.list
+    line: "deb http://rspamd.com/apt-stable/ {{ ansible_distribution_release }} main"
+    create: yes
+
+- name: Add rspamd repositories
+  lineinfile:
+    path: /etc/apt/sources.list.d/rspamd.list
+    line: "deb-src http://rspamd.com/apt-stable/ {{ ansible_distribution_release }} main"
+    create: yes
+
+- name: Update apt cache
+  apt: update_cache=yes
+
+- name: Install rspamd packages
+  apt: pkg={{ item }} state=installed
+  with_items:
+    - rspamd
+    - redis-server
+
+- name: Stop rspamd service
+  service:
+    name: rspamd
+    state: stopped
+
+- name: Generate rspamd password hash
+  command: rspamadm pw -p "{{ mail_password }}"
+  no_log: True
+  register: mail_password_rspamd
+
+
+- name: Copy all rspamd configuration files
+  copy:
+    src: "{{ item }}"
+    dest: "/etc/rspamd/local.d/{{ item }}"
+  loop:
+    - options.inc
+    - worker-normal.inc
+    - worker-proxy.inc
+    - logging.inc
+    - milter_headers.conf
+    - classifier-bayes.conf
+    - redis.conf
+
+- name: Copy all rspamd configuration file templates
+  template:
+    src: "{{ item }}.jinja2"
+    dest: "/etc/rspamd/local.d/{{ item }}"
+    mode: '640'
+  loop:
+    - dkim_signing.conf
+    - worker-controller.inc
+
+- name: Create DKIM rspamd directory
+  file:
+    path: "/var/lib/rspamd/dkim"
+    state: directory
+
+- name: Generate DKIM signature
+  command: 'bash -c "rspamadm dkim_keygen -b 2048 -s {{ ansible_date_time.year }} -k /var/lib/rspamd/dkim/{{ ansible_date_time.year }}.key > /var/lib/rspamd/dkim/{{ ansible_date_time.year }}.txt"'
+
+- name: Display DKIM signature
+  command: "cat /var/lib/rspamd/dkim/{{ ansible_date_time.year }}.txt"
+  register: dkim
+
+- debug: var=dkim.stdout
+
+- name: Fix permissions on DKIM directories
+  file:
+    path: "/var/lib/rspamd/dkim"
+    state: directory
+    mode: '440'
+    recurse: yes
+    owner: _rspamd
+    group: _rspamd
+
+- name: Copy rspamd configuration for ARC module
+  copy:
+    src: /etc/rspamd/local.d/dkim_signing.conf
+    dest: /etc/rspamd/local.d/arc.conf
+    remote_src: true
+
+- name: Restart rspamd service
+  service:
+    name: rspamd
+    state: restarted

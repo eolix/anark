@@ -1,0 +1,27 @@
+---
+- name: Install Sogo packages
+  apt: pkg={{ item }} state=installed
+  with_items:
+    - sogo
+
+- name: Stop sogo services
+  service:
+    name: "{{ item }}"
+    state: stopped
+  loop:
+    - sogo
+    - memcached
+
+- name: Copy sogo configuration
+  template:
+    src: sogo.conf.jinja2
+    dest: /etc/sogo/sogo.conf
+  no_log: True
+
+- name: Restart sogo services
+  service:
+    name: "{{ item }}"
+    state: restarted
+  loop:
+    - sogo
+    - memcached

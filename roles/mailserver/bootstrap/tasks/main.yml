@@ -24,6 +24,8 @@
     - zip
     - openssl
     - whois
+    - lsb-release
+    - wget
 
 - name: Change hostname
   hostname:
@@ -41,3 +43,38 @@
     dest: /etc/mailname
     line: "mail.{{mail_domain}} mail"
     state: present
+
+- name: Create vmail directory
+  file:
+    path: "{{ mail_storage }}"
+    state: directory
+
+- name: Ensure group "vmail" 
+  group:
+    name: vmail
+    gid: 5000
+    state: present
+
+- name: Add user "vmail"  
+  user:
+    name: vmail
+    groups: vmail
+    shell: /sbin/nologin
+    append: yes
+    home: /var/vmail
+    uid: 5000
+    state: present
+
+- name: Set up all vmail directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '770'
+    recurse: yes
+    owner: vmail
+    group: vmail
+  loop:
+    - "{{ mail_storage }}"
+    - "{{ mail_storage }}/mailboxes"
+    - "{{ mail_storage }}/sieve"
+    - "{{ mail_storage }}/sieve/global"

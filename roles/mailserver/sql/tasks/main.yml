@@ -8,10 +8,6 @@
 - name: Install PyMySQL with pip3
   command: pip3 install PyMySQL
 
-- set_fact:
-    root_db_password: "{{ lookup('password', secretpath + '/' + 'root_db_password', length=32) }}"
-  no_log: True
-
 - name: Set MariaDB root user password
   command: mysql --execute="SET PASSWORD FOR 'root'@'localhost' = PASSWORD('{{root_db_password}}');"
   no_log: True
@@ -59,10 +55,6 @@
     path: /tmp/vmail.sql
     state: absent
 
-- set_fact:
-    vmail_db_password: "{{ lookup('password', secretpath + '/' + 'vmail_db_password', length=32) }}"
-  no_log: True
-
 - name: Create database user with password and define privileges
   mysql_user:
     login_unix_socket: /var/run/mysqld/mysqld.sock
@@ -71,3 +63,51 @@
     priv: 'vmail.*:SELECT'
     state: present
   no_log: True
+
+- block:
+  - name: Copy SQL commands to run in new database
+    template:
+      src: sogo.sql.jinja2
+      dest: /tmp/sogo.sql
+    no_log: True
+
+  - name: check if sogo DB exists
+    shell: mysql -e "SHOW DATABASES LIKE 'sogo'" -sN
+    register: dbstatus
+
+  - name: Delete sogo database
+    command: mysql -e "DROP DATABASE sogo" -sN
+    ignore_errors: true
+    when: recreate_databases | default('false')  == 'true'
+
+  - name: Create sogo database
+    mysql_db:
+      login_unix_socket: /var/run/mysqld/mysqld.sock
+      name: sogo 
+      encoding: utf8
+      target: /tmp/sogo.sql
+      state: import
+    when: (not dbstatus.stdout_lines) or (recreate_databases | default('false')  == 'true') 
+
+  - name: Cleanup SQL commands temp file
+    file:
+      path: /tmp/sogo.sql
+      state: absent
+
+  - name: Create sogo database user with password and define privileges
+    mysql_user:
+      login_unix_socket: /var/run/mysqld/mysqld.sock
+      name: sogo@localhost
+      password: "{{ sogo_db_password }}"
+      priv: 'sogo.*:ALL'
+      state: present
+    no_log: True
+  
+  - name: Modify sogo database user to access vmail accounts
+    mysql_user:
+      login_unix_socket: /var/run/mysqld/mysqld.sock
+      name: sogo@localhost
+      append_privs: yes
+      priv: 'vmail.accounts:SELECT'
+      state: present
+  when: sogo | default('true')  == 'true'

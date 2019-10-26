@@ -1,0 +1,3 @@
+dependencies:
+  - role: 'setpasswords'
+    run_once: true
