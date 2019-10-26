@@ -42,6 +42,11 @@
   ignore_errors: true
   when: recreate_databases | default('false')  == 'true'
 
+- name: Delete vmail DB username
+  command: mysql -e "DELETE FROM mysql.user WHERE user='vmail'" -sN
+  ignore_errors: true
+  when: recreate_databases | default('false')  == 'true'
+
 - name: Create vmail database
   mysql_db:
     login_unix_socket: /var/run/mysqld/mysqld.sock
@@ -56,14 +61,9 @@
     path: /tmp/vmail.sql
     state: absent
 
-- name: Create database user with password and define privileges
-  mysql_user:
-    login_unix_socket: /var/run/mysqld/mysqld.sock
-    host: "%"
-    name: vmail
-    password: "{{ vmail_db_password }}"
-    priv: 'vmail.*:SELECT'
-    state: present
+- name: Set DB vmail user password
+  command: mysql --execute="SET PASSWORD FOR 'vmail'@'localhost' = PASSWORD('{{ vmail_db_password }}');"
+  no_log: True
 
 - block:
   - name: Copy SQL commands to run in new database
@@ -81,6 +81,11 @@
     ignore_errors: true
     when: recreate_databases | default('false')  == 'true'
 
+  - name: Delete sogo DB username
+    command: mysql -e "DELETE FROM mysql.user WHERE user='sogo'" -sN
+    ignore_errors: true
+    when: recreate_databases | default('false')  == 'true'    
+
   - name: Create sogo database
     mysql_db:
       login_unix_socket: /var/run/mysqld/mysqld.sock
@@ -95,21 +100,8 @@
       path: /tmp/sogo.sql
       state: absent
 
-  - name: Create sogo database user with password and define privileges
-    mysql_user:
-      login_unix_socket: /var/run/mysqld/mysqld.sock
-      host: "%"
-      name: sogo
-      password: "{{ sogo_db_password }}"
-      priv: 'sogo.*:ALL'
-      state: present
-  
-  - name: Modify sogo database user to access vmail accounts
-    mysql_user:
-      login_unix_socket: /var/run/mysqld/mysqld.sock
-      host: "%"
-      name: sogo
-      append_privs: yes
-      priv: 'vmail.accounts:SELECT'
-      state: present
+  - name: Set DB sogo user password
+    command: mysql --execute="SET PASSWORD FOR 'sogo'@'localhost' = PASSWORD('{{ sogo_db_password }}');"
+    no_log: True
+
   when: sogo | default('true')  == 'true'
