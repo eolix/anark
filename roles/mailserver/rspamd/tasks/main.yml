@@ -53,7 +53,6 @@
   template:
     src: "{{ item }}.jinja2"
     dest: "/etc/rspamd/local.d/{{ item }}"
-    mode: '640'
   loop:
     - dkim_signing.conf
     - worker-controller.inc
@@ -63,14 +62,23 @@
     path: "/var/lib/rspamd/dkim"
     state: directory
 
+- name: Check if DKIM signature exists
+  stat: 
+    path: "/var/lib/rspamd/dkim/{{ ansible_date_time.year }}.txt"
+  register: dkim_signature
+
 - name: Generate DKIM signature
   command: 'bash -c "rspamadm dkim_keygen -b 2048 -s {{ ansible_date_time.year }} -k /var/lib/rspamd/dkim/{{ ansible_date_time.year }}.key > /var/lib/rspamd/dkim/{{ ansible_date_time.year }}.txt"'
+  when: dkim_signature.stat.exists == False
 
 - name: Display DKIM signature
   command: "cat /var/lib/rspamd/dkim/{{ ansible_date_time.year }}.txt"
   register: dkim
 
-- debug: var=dkim.stdout
+- set_fact:
+    dkim_dns_data: "{{ dkim.stdout | replace('\t','') | replace('\n','') | replace('\"','') }}"
+
+- debug: var=dkim_dns_data
 
 - name: Fix permissions on DKIM directories
   file:
@@ -91,3 +99,4 @@
   service:
     name: rspamd
     state: restarted
+    enabled: yes

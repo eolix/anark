@@ -4,6 +4,7 @@
   with_items:
     - mariadb-server
     - python3-pymysql
+    - dovecot-core
 
 - name: Install PyMySQL with pip3
   command: pip3 install PyMySQL
@@ -22,7 +23,7 @@
   no_log: True
 
 - name: Generate SHA-512 hash of password
-  command: mkpasswd -m sha-512 "{{ mail_password }}"
+  command: doveadm pw -s SHA512-CRYPT -p "{{ mail_password }}"
   no_log: True
   register: mail_password_sha512
 
@@ -58,11 +59,11 @@
 - name: Create database user with password and define privileges
   mysql_user:
     login_unix_socket: /var/run/mysqld/mysqld.sock
-    name: vmail@localhost
+    host: "%"
+    name: vmail
     password: "{{ vmail_db_password }}"
     priv: 'vmail.*:SELECT'
     state: present
-  no_log: True
 
 - block:
   - name: Copy SQL commands to run in new database
@@ -97,16 +98,17 @@
   - name: Create sogo database user with password and define privileges
     mysql_user:
       login_unix_socket: /var/run/mysqld/mysqld.sock
-      name: sogo@localhost
+      host: "%"
+      name: sogo
       password: "{{ sogo_db_password }}"
       priv: 'sogo.*:ALL'
       state: present
-    no_log: True
   
   - name: Modify sogo database user to access vmail accounts
     mysql_user:
       login_unix_socket: /var/run/mysqld/mysqld.sock
-      name: sogo@localhost
+      host: "%"
+      name: sogo
       append_privs: yes
       priv: 'vmail.accounts:SELECT'
       state: present

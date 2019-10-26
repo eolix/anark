@@ -30,16 +30,16 @@
     // For debugging it is reasonable to turn pooling off.
     //NGImap4DisableIMAP4Pooling = NO;
 
-    SOGoProfileURL = "mysql://sogo:{{ sogo_db_password }}@127.0.0.1:3306/sogo/sogo_user_profile";
-    OCSFolderInfoURL = "mysql://sogo:{{ sogo_db_password }}@127.0.0.1:3306/sogo/sogo_folder_info";
-    OCSSessionsFolderURL = "mysql://sogo:{{ sogo_db_password }}@127.0.0.1:3306/sogo/sogo_sessions_folder";
-    OCSEMailAlarmsFolderURL = "mysql://sogo:{{ sogo_db_password }}@127.0.0.1:3306/sogo/sogo_alarms_folder";
+    SOGoProfileURL = "mysql://sogo:{{ sogo_db_password }}@localhost:3306/sogo/sogo_user_profile";
+    OCSFolderInfoURL = "mysql://sogo:{{ sogo_db_password }}@localhost:3306/sogo/sogo_folder_info";
+    OCSSessionsFolderURL = "mysql://sogo:{{ sogo_db_password }}@localhost:3306/sogo/sogo_sessions_folder";
+    OCSEMailAlarmsFolderURL = "mysql://sogo:{{ sogo_db_password }}@localhost:3306/sogo/sogo_alarms_folder";
 
     // With 3 parameters below, SOGo requires only 9 SQL tables in total
     // instead of creating 4 SQL tables for each user.
-    OCSCacheFolderURL = "mysql://sogo:{{ sogo_db_password }}@127.0.0.1:3306/sogo/sogo_cache_folder";
-    OCSStoreURL = "mysql://sogo:{{ sogo_db_password }}@127.0.0.1:3306/sogo/sogo_store";
-    OCSAclURL = "mysql://sogo:{{ sogo_db_password }}@127.0.0.1:3306/sogo/sogo_acl";
+    OCSCacheFolderURL = "mysql://sogo:{{ sogo_db_password }}@localhost:3306/sogo/sogo_cache_folder";
+    OCSStoreURL = "mysql://sogo:{{ sogo_db_password }}@localhost:3306/sogo/sogo_store";
+    OCSAclURL = "mysql://sogo:{{ sogo_db_password }}@localhost:3306/sogo/sogo_acl";
 
     // Default language in the web interface
     SOGoLanguage = English;
@@ -101,7 +101,7 @@
         {
             type = sql;
             id = vmail_mailbox;
-            viewURL = "mysql://sogo:{{ sogo_db_password }}@127.0.0.1:3306/sogo/users";
+            viewURL = "mysql://sogo:{{ sogo_db_password }}@localhost:3306/sogo/users";
             canAuthenticate = YES;
 
             // Default algorithm used when changing passwords.

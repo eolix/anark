@@ -1,0 +1,22 @@
+---
+- name: Install nginx packages
+  apt: pkg={{ item }} state=installed
+  with_items:
+    - nginx
+
+- shell: /bin/rm -rf /etc/nginx/sites-enabled/*
+- shell: /bin/rm -rf /etc/nginx/sites-available/*
+
+- name: Copy nginx server configuration
+  template:
+    src: "domain.jinja2"
+    dest: "/etc/nginx/sites-available/mail.{{ mail_domain }}"
+
+- name: Create symbolic link 
+  file:
+    src: "/etc/nginx/sites-available/mail.{{ mail_domain }}"
+    dest: "/etc/nginx/sites-enabled/mail.{{ mail_domain }}"
+    state: link
+
+- name: Reload nginx configuration
+  command: nginx -s reload

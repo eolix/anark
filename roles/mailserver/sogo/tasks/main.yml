@@ -22,6 +22,7 @@
   service:
     name: "{{ item }}"
     state: restarted
+    enabled: yes
   loop:
     - sogo
     - memcached

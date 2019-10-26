@@ -1,0 +1,64 @@
+---
+
+- name: Start and enable DNS service
+  service:
+    name: unbound
+    state: started
+    enabled: yes
+  when: dns | default('true') | bool
+
+- name: Make sure that Certbot is set to renew SSL certificates weekly
+  cron:
+    name: certbot
+    job: certbot renew --pre-hook "systemctl stop nginx" --post-hook "systemctl start nginx" --renew-hook "systemctl reload nginx; systemctl reload dovecot; systemctl reload postfix" --quiet
+    state: present
+    special_time: weekly
+  when: certbot | default('true') | bool
+
+- name: Start and enable MariaDB service
+  service:
+    name: mariadb
+    state: started
+    enabled: yes
+  when: sql | default('true') | bool
+
+- name: Start and enable Dovecot service
+  service:
+    name: dovecot
+    state: started
+    enabled: yes
+  when: dovecot | default('true') | bool
+
+- name: Start and enable Postfix service
+  service:
+    name: postfix
+    state: started
+    enabled: yes
+  when: postfix | default('true') | bool
+
+- name: Start and enable rspamd services
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  loop:
+    - rspamd
+    - redis
+  when: rspamd | default('true') | bool
+
+- name: Start and enable sogo services
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  loop:
+    - sogo
+    - memcached
+  when: sogo | default('true') | bool
+
+- name: Start and enable nginx service
+  service:
+    name: nginx
+    state: started
+    enabled: yes
+  when: nginx | default('true') | bool

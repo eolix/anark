@@ -26,6 +26,7 @@
     service:
       name: "{{ item }}"
       state: restarted
+      enabled: yes
     loop:
       - nginx
       - apache
