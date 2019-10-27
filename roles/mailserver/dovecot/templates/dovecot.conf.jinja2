@@ -109,7 +109,7 @@ mail_gid = vmail
 mail_privileged_group = vmail
 
 
-mail_home = /var/vmail/mailboxes/%d/%n
+mail_home = {{ mail_storage }}/mailboxes/%d/%n
 mail_location = maildir:~/mail:LAYOUT=fs
 
 
@@ -158,13 +158,13 @@ plugin {
     ### Spam learning
     ###
     # From elsewhere to Spam folder
-    imapsieve_mailbox1_name = Spam
+    imapsieve_mailbox1_name = Junk
     imapsieve_mailbox1_causes = COPY
     imapsieve_mailbox1_before = file:{{ mail_storage }}/sieve/global/learn-spam.sieve
 
     # From Spam folder to elsewhere
     imapsieve_mailbox2_name = *
-    imapsieve_mailbox2_from = Spam
+    imapsieve_mailbox2_from = Junk
     imapsieve_mailbox2_causes = COPY
     imapsieve_mailbox2_before = file:{{ mail_storage }}/sieve/global/learn-ham.sieve
 

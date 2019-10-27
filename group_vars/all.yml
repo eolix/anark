@@ -3,6 +3,6 @@ mail_domain: mydomain.tld # the 'mail' subdomain will be added throughout the pl
 mail_user: mymainuser # the main e-mail account. Postmaster will be aliased to this account
 mail_password: <run 'ansible-vault encrypt_string' and paste the contents here>
 mail_quota: 20480 # amount of available disk space for the main e-mail account
-mail_storage: /var/mail # this will be the vmail home and where all emails will be stored
+mail_storage: /var/vmail # this will be the vmail home and where all emails will be stored
 
 secretpath: '{{ inventory_dir | realpath + "/secret" }}'
