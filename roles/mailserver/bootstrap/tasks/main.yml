@@ -61,7 +61,7 @@
     groups: vmail
     shell: /sbin/nologin
     append: yes
-    home: /var/vmail
+    home: "{{ mail_storage }}"
     uid: 5000
     state: present
 
