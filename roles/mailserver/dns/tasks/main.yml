@@ -8,12 +8,18 @@
 
 - name: Update DNSSEC Root key
   command: unbound-anchor -a /var/lib/unbound/root.key
-  become_user: unbound
 
-- name: Reload DNS service
+- name: Set correct ownership to DNSSEC Root key 
+  file:
+    path: /var/lib/unbound/root.key
+    state: touch
+    owner: unbound
+    group: unbound
+
+- name: Restart DNS service
   service:
     name: unbound
-    state: reloaded
+    state: restarted
 
 - name: Add own DNS server to resolv
   lineinfile:

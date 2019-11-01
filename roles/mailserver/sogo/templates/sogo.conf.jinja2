@@ -15,6 +15,11 @@
 
     // Daemon address and port
     WOPort = 127.0.0.1:20000;
+    WOWorkersCount = 100;
+    SxVMemLimit = 384;
+    SOGoMaximumPingInterval = 3540;
+    SOGoInternalSyncInterval = 45;
+    SOGoMaximumSyncInterval = 60;
 
     // PID file
     //WOPidFile = /var/run/sogo/sogo.log;
@@ -49,6 +54,7 @@
 
     // Must login with full email address
     SOGoForceExternalLoginWithEmail = YES;
+    SOGoForceIMAPLoginWithEmail = YES;
 
     // Allow user to change full name and email address.
     SOGoMailCustomFromEnabled = YES;
@@ -57,11 +63,11 @@
     SOGoEnableEMailAlarms = YES;
 
     // IMAP server
-    SOGoIMAPServer = "imaps://127.0.0.1:143/?tls=YES";
+    // SOGoIMAPServer = "imaps://localhost:993/?tls=YES";
     // Local connection is considered as secure by Dovecot.
-    // SOGoIMAPServer = "imap://127.0.0.1:143/";
+    SOGoIMAPServer = "imaps://{{ mail_domain }}:993/";
 
-    SOGoMailDomain = eolix.uk;
+    SOGoMailDomain = {{ mail_domain }};
 
     // SMTP server
     SOGoMailingMechanism = smtp;

@@ -26,6 +26,7 @@
     - whois
     - lsb-release
     - wget
+    - apt-utils
 
 - name: Change hostname
   hostname:
@@ -43,11 +44,27 @@
     dest: /etc/mailname
     line: "mail.{{mail_domain}} mail"
     state: present
+    create: true
 
-- name: Create vmail directory
+- name: Add ll alias to ls -lart
+  lineinfile:
+    dest: /root/.bashrc
+    line: "alias ll='ls -lart'"
+    state: present
+
+#- name: Create vmail directory
+#  file:
+#    path: "{{ mail_storage }}"
+#    state: directory
+
+- name: Set up all vmail directories
   file:
-    path: "{{ mail_storage }}"
+    path: "{{ item }}"
     state: directory
+  loop:
+    - "{{ mail_storage }}"
+    - "{{ mail_storage }}/sieve"
+    - "{{ mail_storage }}/sieve/global"
 
 - name: Ensure group "vmail" 
   group:
@@ -64,17 +81,3 @@
     home: "{{ mail_storage }}"
     uid: 5000
     state: present
-
-- name: Set up all vmail directories
-  file:
-    path: "{{ item }}"
-    state: directory
-    mode: '770'
-    recurse: yes
-    owner: vmail
-    group: vmail
-  loop:
-    - "{{ mail_storage }}"
-    - "{{ mail_storage }}/mailboxes"
-    - "{{ mail_storage }}/sieve"
-    - "{{ mail_storage }}/sieve/global"

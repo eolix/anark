@@ -3,72 +3,71 @@
   apt: pkg={{ item }} state=installed
   with_items:
     - postfix
-    - postfix-mysql
   
 - name: Stop Postfix service
   service:
     name: postfix
     state: stopped
 
-- name: Remove default configuration
-  file:
-    path: "{{ item }}"
-    state: absent
-  loop:
-    - /etc/postfix/sasl
-    - /etc/postfix/main.cf.proto
-    - /etc/postfix/master.cf.proto
-  
-- name: Copy Postfix main configuration
+- name: Copy Postfix configuration
   template:
-    src: main.cf.jinja2
-    dest: /etc/postfix/main.cf
-    mode: '440'
+    src: "{{ item }}.jinja2"
+    dest: "/etc/postfix/{{ item }}"
+#    mode: '640'
+  loop:
+    - main.cf
+    - mysql-virtual-mailbox-domains.cf
+    - mysql-virtual-mailbox-maps.cf
+    - mysql-virtual-alias-maps.cf
+    - mysql-virtual-email2email.cf
 
 - name: Copy Postfix master configuration
   copy:
-    src: "{{ item }}"
-    dest: "/etc/postfix/{{ item }}"
-  loop:
-    - master.cf
-    - submission_header_cleanup
+    src: master.cf
+    dest: /etc/postfix/master.cf
 
-- name: Create Postfix SQL configuration directory
+- name: Make sure postfix configuration files have the correct permissions
   file:
-    path: /etc/postfix/sql
+    path: /etc/postfix
     state: directory
     mode: '640'
     recurse: yes
 
-- name: Copy Postfix SQL configuration
-  template:
-    src: "{{ item }}.jinja2"
-    dest: "/etc/postfix/sql/{{ item }}"
-    mode: '640'
-  loop:
-    - accounts.cf
-    - aliases.cf
-    - domains.cf
-    - recipient-access.cf
-    - sender-login-maps.cf
-    - tls-policy.cf
+- name: Install Postfix packages
+  apt: pkg={{ item }} state=installed
+  with_items:
+    - postfix-mysql
+    - postfix-policyd-spf-python
 
-- name: Create extra empty configuration files for Postfix
-  file:
-    path: "/etc/postfix/{{ item }}"
-    state: touch
-    mode: '640'
-  loop:
-    - without_ptr
-    - postscreen_access
-
-- name: Map all PTR exceptions
-  command: postmap /etc/postfix/without_ptr
-
-- name: Check for new aliases
-  command: newaliases
+#- name: Copy the spf validation config file
+#  copy:
+#    src: policyd-spf.conf
+#    dest: /etc/postfix-policyd-spf-python/policyd-spf.conf   
 
 - name: Reload Postfix service
   service:
     name: postfix
     state: reloaded
+
+- name: Start Postfix service
+  service:
+    name: postfix
+    state: started
+
+- name: Test domain can be resolved by postfix
+  command: postmap -q {{ mail_domain }} mysql:/etc/postfix/mysql-virtual-mailbox-domains.cf
+  register: result
+  failed_when:
+    - '"1" not in result.stdout'
+
+- name: Test main email can be resolved by postfix
+  command: postmap -q {{ mail_user }}@{{ mail_domain }} mysql:/etc/postfix/mysql-virtual-mailbox-maps.cf
+  register: result
+  failed_when:
+    - '"1" not in result.stdout'
+
+- name: Test postmaster can be resolved by postfix
+  command: postmap -q postmaster@{{ mail_domain }} mysql:/etc/postfix/mysql-virtual-alias-maps.cf
+  register: result
+  failed_when:
+    - '"{{ mail_user }}@{{ mail_domain }}" not in result.stdout'

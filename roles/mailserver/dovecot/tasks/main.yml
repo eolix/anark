@@ -4,6 +4,7 @@
   with_items:
     - dovecot-core
     - dovecot-imapd
+    - dovecot-pop3d
     - dovecot-lmtpd
     - dovecot-mysql
     - dovecot-sieve
@@ -14,18 +15,33 @@
     name: dovecot
     state: stopped
 
-- shell: /bin/rm -rf /etc/dovecot/*
+- name: Create email storage directory
+  file:
+    path: "{{ mail_storage }}/vhosts/{{ mail_domain }}"
+    state: directory
+    recurse: yes
+    owner: vmail
+    group: vmail
 
-- name: Copy Dovecot main configuration
+- name: Copy Dovecot main configurations
   template:
-    src: dovecot.conf.jinja2
-    dest: /etc/dovecot/dovecot.conf
+    src: "{{ item }}.jinja2"
+    dest: "/etc/dovecot/{{ item }}"
+  loop:
+    - dovecot.conf
+    - dovecot-sql.conf.ext
 
-- name: Copy Dovecot SQL configuration
+- name: Copy Dovecot configuration files
   template:
-    src: dovecot-sql.conf.jinja2
-    dest: /etc/dovecot/dovecot-sql.conf
-    mode: '440'
+    src: "{{ item }}.jinja2"
+    dest: "/etc/dovecot/conf.d/{{ item }}"
+  loop:
+    - 10-mail.conf
+    - 10-auth.conf
+    - 10-master.conf
+    - 10-ssl.conf
+    - auth-sql.conf.ext
+
 
 - name: Copy all sieve configuration files
   copy:
@@ -36,3 +52,16 @@
     - learn-spam.sieve
     - learn-ham.sieve
 
+- name: Make sure dovecot configuration files have the correct permissions
+  file:
+    path: /etc/dovecot
+    state: directory
+    mode: '640'
+    recurse: yes
+    owner: vmail
+    group: dovecot
+
+- name: Start Dovecot service
+  service:
+    name: dovecot
+    state: started

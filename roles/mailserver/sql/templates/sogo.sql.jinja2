@@ -1,5 +1,5 @@
-CREATE VIEW sogo.users (c_uid, c_name, c_password, c_cn, mail, domain) AS SELECT email, username, password, username, email, domain FROM vmail.accounts WHERE enabled=1;
+CREATE VIEW sogo.users (c_uid, c_name, c_password, c_cn, mail, domain) AS SELECT email, username, password, username, email, domain FROM vmail.virtual_users;
 
 GRANT ALL ON sogo.* TO sogo@localhost IDENTIFIED BY '{{ sogo_db_password }}';
 
-GRANT SELECT ON vmail.accounts TO sogo@localhost;
+GRANT ALL ON vmail.virtual_users TO sogo@localhost;

@@ -1,9 +1,9 @@
 ---
 
-- name: Start and enable DNS service
+- name: Restart and enable DNS service
   service:
     name: unbound
-    state: started
+    state: restarted
     enabled: yes
   when: dns | default('true') | bool
 
@@ -15,50 +15,50 @@
     special_time: weekly
   when: certbot | default('true') | bool
 
-- name: Start and enable MariaDB service
+- name: Restart and enable MySQL service
   service:
-    name: mariadb
-    state: started
+    name: mysql
+    state: restarted
     enabled: yes
   when: sql | default('true') | bool
 
-- name: Start and enable Dovecot service
+- name: Restart and enable Dovecot service
   service:
     name: dovecot
-    state: started
+    state: restarted
     enabled: yes
   when: dovecot | default('true') | bool
 
-- name: Start and enable Postfix service
+- name: Restart and enable Postfix service
   service:
     name: postfix
-    state: started
+    state: restarted
     enabled: yes
   when: postfix | default('true') | bool
 
-- name: Start and enable rspamd services
+- name: Restart and enable rspamd services
   service:
     name: "{{ item }}"
-    state: started
+    state: restarted
     enabled: yes
   loop:
     - rspamd
     - redis
   when: rspamd | default('true') | bool
 
-- name: Start and enable sogo services
+- name: Restart and enable sogo services
   service:
     name: "{{ item }}"
-    state: started
+    state: restarted
     enabled: yes
   loop:
     - sogo
     - memcached
   when: sogo | default('true') | bool
 
-- name: Start and enable nginx service
+- name: Restart and enable nginx service
   service:
     name: nginx
-    state: started
+    state: restarted
     enabled: yes
   when: nginx | default('true') | bool

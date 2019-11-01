@@ -71,29 +71,36 @@
   command: 'bash -c "rspamadm dkim_keygen -b 2048 -s {{ ansible_date_time.year }} -k /var/lib/rspamd/dkim/{{ ansible_date_time.year }}.key > /var/lib/rspamd/dkim/{{ ansible_date_time.year }}.txt"'
   when: dkim_signature.stat.exists == False
 
-- name: Display DKIM signature
-  command: "cat /var/lib/rspamd/dkim/{{ ansible_date_time.year }}.txt"
-  register: dkim
+- name: Extract DKIM DNS information
+  slurp:
+    src: "/var/lib/rspamd/dkim/{{ ansible_date_time.year }}.txt"
+  register: dkim_dns_data
 
-- set_fact:
-    dkim_dns_data: "{{ dkim.stdout | replace('\t','') | replace('\n','') | replace('\"','') }}"
+- debug:
+    msg: "{{ dkim_dns_data['content'] | b64decode | replace('\t','') | replace('\n','') | replace('\"','') }}"
 
-- debug: var=dkim_dns_data
+- name: Add extra configuration lines to dkim_signing configuration
+  blockinfile:
+    path: /etc/rspamd/local.d/dkim_signing.conf
+    insertafter: EOF
+    block: |
+      auth_only = false;
+      sign_networks ["127.0.0.1"]
+
+- name: Copy dkim rspamd configuration for ARC module
+  copy:
+    src: /etc/rspamd/local.d/dkim_signing.conf
+    dest: /etc/rspamd/local.d/arc.conf
+    remote_src: true
 
 - name: Fix permissions on DKIM directories
   file:
     path: "/var/lib/rspamd/dkim"
     state: directory
-    mode: '440'
+    mode: '750'
     recurse: yes
     owner: _rspamd
     group: _rspamd
-
-- name: Copy rspamd configuration for ARC module
-  copy:
-    src: /etc/rspamd/local.d/dkim_signing.conf
-    dest: /etc/rspamd/local.d/arc.conf
-    remote_src: true
 
 - name: Restart rspamd service
   service:

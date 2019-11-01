@@ -14,20 +14,19 @@
       when: certbot | default('true') | bool
     - role: mailserver/sql
       when: sql | default('true') | bool
-    - role: mailserver/dovecot
-      when: dovecot | default('true') | bool
     - role: mailserver/postfix
       when: postfix | default('true') | bool
+    - role: mailserver/dovecot
+      when: dovecot | default('true') | bool
     - role: mailserver/rspamd
       when: rspamd | default('true') | bool
     - role: mailserver/sogo
       when: sogo | default('true') | bool
     - role: mailserver/nginx
       when: nginx | default('true') | bool
-#  tags: clusterbuild_clean
 
 - name: Make sure all services are running
   hosts: all
   roles:
-    - role: mailserver/startservices
+    - role: mailserver/restartenable
   tags: always

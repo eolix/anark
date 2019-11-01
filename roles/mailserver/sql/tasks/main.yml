@@ -13,7 +13,7 @@
   command: mysql --execute="SET PASSWORD FOR 'root'@'localhost' = PASSWORD('{{root_db_password}}');"
   no_log: True
 
-- name: Create  MariaDB .my.cnf
+- name: Create MariaDB .my.cnf
   template:
     src: "my.cnf.jinja2"
     dest: "/root/.my.cnf"
@@ -21,11 +21,6 @@
     group: root
     mode: 0600
   no_log: True
-
-- name: Generate SHA-512 hash of password
-  command: doveadm pw -s SHA512-CRYPT -p "{{ mail_password }}"
-  no_log: True
-  register: mail_password_sha512
 
 - name: Copy SQL commands to run in new database
   template:
@@ -40,12 +35,12 @@
 - name: Delete vmail database
   command: mysql -e "DROP DATABASE vmail" -sN
   ignore_errors: true
-  when: recreate_databases | default('false')  == 'true'
+  when: (dbstatus.stdout_lines) and (recreate_databases | default('false')  == 'true')
 
 - name: Delete vmail DB username
   command: mysql -e "DELETE FROM mysql.user WHERE user='vmail'" -sN
   ignore_errors: true
-  when: recreate_databases | default('false')  == 'true'
+  when: (dbstatus.stdout_lines) and (recreate_databases | default('false')  == 'true')
 
 - name: Create vmail database
   mysql_db:
@@ -79,12 +74,12 @@
   - name: Delete sogo database
     command: mysql -e "DROP DATABASE sogo" -sN
     ignore_errors: true
-    when: recreate_databases | default('false')  == 'true'
+    when: (dbstatus.stdout_lines) and (recreate_databases | default('false')  == 'true')
 
   - name: Delete sogo DB username
     command: mysql -e "DELETE FROM mysql.user WHERE user='sogo'" -sN
     ignore_errors: true
-    when: recreate_databases | default('false')  == 'true'    
+    when: (dbstatus.stdout_lines) and (recreate_databases | default('false')  == 'true')
 
   - name: Create sogo database
     mysql_db:
