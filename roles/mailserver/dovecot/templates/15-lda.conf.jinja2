@@ -1,0 +1,9 @@
+##
+## LDA specific settings (also used by LMTP)
+##
+
+postmaster_address = postmaster@{{mail_domain}}
+
+protocol lda {
+  mail_plugins = $mail_plugins sieve
+}

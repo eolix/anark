@@ -1,7 +1,8 @@
 ---
 - name: Install Certbot packages
-  apt: pkg={{ item }} state=installed
-  with_items:
+  apt:
+    state: present
+    pkg:
     - certbot
 
 - name: Check if certificate already exists

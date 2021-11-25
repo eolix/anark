@@ -1,7 +1,8 @@
 ---
 - name: Install Dovecot packages
-  apt: pkg={{ item }} state=installed
-  with_items:
+  apt:
+    state: present
+    pkg:
     - dovecot-core
     - dovecot-imapd
     - dovecot-pop3d
@@ -40,8 +41,9 @@
     - 10-auth.conf
     - 10-master.conf
     - 10-ssl.conf
+    - 15-lda.conf
+    - 20-lmtp.conf
     - auth-sql.conf.ext
-
 
 - name: Copy all sieve configuration files
   copy:
@@ -52,6 +54,19 @@
     - learn-spam.sieve
     - learn-ham.sieve
 
+- name: Compile sieve filters
+  command: /usr/bin/sievec .
+  args:
+    chdir: "{{ mail_storage }}/sieve/global/"
+
+- name: Create custom sieve filters folder
+  file:
+    path: "{{ mail_storage }}/sieve/{{ mail_domain }}/{{ mail_user }}"
+    state: directory
+    recurse: yes
+    owner: vmail
+    group: dovecot
+
 - name: Make sure dovecot configuration files have the correct permissions
   file:
     path: /etc/dovecot
@@ -60,6 +75,12 @@
     recurse: yes
     owner: vmail
     group: dovecot
+
+- name: Disable default PAM authentication for Dovecot
+  replace:
+    path: "/etc/dovecot/conf.d/auth-system.conf.ext"
+    regexp: '^passdb {(.*\n)*}$'
+    replace: ''
 
 - name: Start Dovecot service
   service:

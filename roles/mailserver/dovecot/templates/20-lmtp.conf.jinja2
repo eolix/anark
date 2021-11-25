@@ -1,0 +1,8 @@
+##
+## LMTP specific settings
+##
+
+protocol lmtp {
+  mail_plugins = $mail_plugins sieve
+  mail_fsync = optimized
+}

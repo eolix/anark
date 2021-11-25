@@ -1,7 +1,8 @@
 ---
 - name: Install SQL packages
-  apt: pkg={{ item }} state=installed
-  with_items:
+  apt:
+    state: present
+    pkg:
     - mariadb-server
     - python3-pymysql
     - dovecot-core

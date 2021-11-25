@@ -1,7 +1,8 @@
 ---
 - name: Install Postfix packages
-  apt: pkg={{ item }} state=installed
-  with_items:
+  apt:
+    state: present
+    pkg:
     - postfix
   
 - name: Stop Postfix service
@@ -34,15 +35,16 @@
     recurse: yes
 
 - name: Install Postfix packages
-  apt: pkg={{ item }} state=installed
-  with_items:
+  apt:
+    state: present
+    pkg:
     - postfix-mysql
     - postfix-policyd-spf-python
 
-#- name: Copy the spf validation config file
-#  copy:
-#    src: policyd-spf.conf
-#    dest: /etc/postfix-policyd-spf-python/policyd-spf.conf   
+- name: Copy the spf validation config file
+  copy:
+    src: policyd-spf.conf
+    dest: /etc/postfix-policyd-spf-python/policyd-spf.conf   
 
 - name: Reload Postfix service
   service:

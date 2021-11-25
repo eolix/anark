@@ -1,5 +1,22 @@
 path = "/var/lib/rspamd/dkim/$selector.key";
 selector = "{{ ansible_date_time.year }}";
 
-### Enable DKIM signing for alias sender addresses
-allow_username_mismatch = true;
+enabled = true;
+# check_pubkey = true;
+# allow_pubkey_mismatch = true;
+
+allow_envfrom_empty = true;
+allow_hdrfrom_mismatch = false;
+allow_hdrfrom_multiple = false;
+auth_only = true;
+sign_local = true;
+symbol = "DKIM_SIGNED";
+try_fallback = false;
+use_domain = "header";
+
+domain {
+{{ mail_domain }} {
+    path = "/var/lib/rspamd/dkim/$selector.key";
+    selector = "{{ ansible_date_time.year }}";
+    }
+}
