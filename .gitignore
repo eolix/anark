@@ -1,2 +1,4 @@
+.DS_Store
 *.retry
 secret
+group_vars/zdi.yml

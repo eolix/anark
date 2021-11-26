@@ -52,6 +52,7 @@ service lmtp {
     user = postfix
     group = postfix
   }
+  client_limit = 1
 
   # Create inet listener only if you can't use the above UNIX socket
   #inet_listener lmtp {

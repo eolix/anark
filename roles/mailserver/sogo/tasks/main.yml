@@ -1,7 +1,8 @@
 ---
 - name: Install Sogo packages
-  apt: pkg={{ item }} state=installed
-  with_items:
+  apt:
+    state: present
+    pkg:
     - sogo
 
 - name: Stop sogo services

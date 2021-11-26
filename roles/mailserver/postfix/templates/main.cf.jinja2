@@ -43,10 +43,8 @@ smtpd_helo_restrictions =
 smtpd_recipient_restrictions =
         permit_mynetworks,
         permit_sasl_authenticated,
-        reject_non_fqdn_recipient,
-        reject_unknown_recipient_domain,
-        reject_unlisted_recipient,
-        reject_unauth_destination
+        reject_unauth_destination,
+        check_policy_service unix:private/policyd-spf
 smtpd_sender_restrictions =
         permit_mynetworks,
         permit_sasl_authenticated,
@@ -115,8 +113,3 @@ milter_mail_macros =  i {mail_addr} {client_addr} {client_name} {auth_authen}
 milter_default_action = accept
 
 policyd-spf_time_limit = 3600
-smtpd_recipient_restrictions =
-   permit_mynetworks,
-   permit_sasl_authenticated,
-   reject_unauth_destination,
-   check_policy_service unix:private/policyd-spf

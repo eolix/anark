@@ -5,9 +5,10 @@
 - name: Upgrade all safe packages
   apt: upgrade=safe
 
-- name: Install basic packages
-  apt: pkg={{ item }} state=installed
-  with_items:
+- name: Install a list of packages
+  apt:
+    state: present
+    pkg:
     - apt-transport-https
     - git
     - htop
@@ -27,6 +28,10 @@
     - lsb-release
     - wget
     - apt-utils
+    - net-tools
+    - telnet
+    - gpg
+    - gpg-agent
 
 - name: Change hostname
   hostname:
@@ -42,7 +47,7 @@
 - name: Add hostname to to /etc/mailname
   lineinfile:
     dest: /etc/mailname
-    line: "mail.{{mail_domain}} mail"
+    line: "mail.{{mail_domain}}"
     state: present
     create: true
 

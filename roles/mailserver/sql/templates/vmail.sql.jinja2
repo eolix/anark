@@ -40,4 +40,14 @@ INSERT INTO `vmail`.`virtual_aliases`
 VALUES
   ('1', '1', 'postmaster@{{ mail_domain }}', '{{ mail_user }}@{{ mail_domain }}');
 
+{% if mail_aliases is defined and mail_aliases|length > 0 %}
+{% for mail_alias in mail_aliases %}
+INSERT INTO `vmail`.`virtual_aliases`
+  (`id`, `domain_id`, `source`, `destination`)
+VALUES
+  ('{{ loop.index + 1 }} ', '1', '{{ mail_alias }}@{{ mail_domain }}', '{{ mail_user }}@{{ mail_domain }}');
+
+{% endfor %}
+{% endif %}
+
 GRANT ALL ON vmail.* TO 'vmail'@'localhost' IDENTIFIED BY '{{ vmail_db_password }}';

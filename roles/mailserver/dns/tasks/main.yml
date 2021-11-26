@@ -1,7 +1,8 @@
 ---
 - name: Install DNS packages
-  apt: pkg={{ item }} state=installed
-  with_items:
+  apt:
+    state: present
+    pkg:
     - unbound
     - resolvconf
     - dnsutils

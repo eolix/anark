@@ -1,7 +1,8 @@
 ---
 - name: Install nginx packages
-  apt: pkg={{ item }} state=installed
-  with_items:
+  apt:
+    state: present
+    pkg:
     - nginx
 
 - shell: /bin/rm -rf /etc/nginx/sites-enabled/*
@@ -17,6 +18,11 @@
     src: "/etc/nginx/sites-available/mail.{{ mail_domain }}"
     dest: "/etc/nginx/sites-enabled/mail.{{ mail_domain }}"
     state: link
+
+- name: Extract base website into /var/www/html
+  unarchive:
+    src: website.tar
+    dest: /var/www/html
 
 - name: Reload nginx configuration
   command: nginx -s reload

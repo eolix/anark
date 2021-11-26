@@ -257,7 +257,7 @@ mail_privileged_group = mail
 # This is done by stat()ing each entry, so it causes more disk I/O.
 # (For systems setting struct dirent->d_type, this check is free and it's
 # done always regardless of this setting)
-#maildir_stat_dirs = no
+maildir_stat_dirs = yes
 
 # When copying a message, do it with hard links whenever possible. This makes
 # the performance much better, and it's unlikely to have any side effects.
@@ -387,7 +387,7 @@ mail_privileged_group = mail
 plugin {
     sieve_plugins = sieve_imapsieve sieve_extprograms
     sieve_before = {{ mail_storage }}/sieve/global/spam-global.sieve
-    sieve = file:{{ mail_storage }}/sieve/%d/%n/scripts;active={{ mail_storage }}/sieve/%d/%n/active-script.sieve
+    sieve = file:{{ mail_storage }}/sieve/%d/%n;active={{ mail_storage }}/sieve/%d/%n/dovecot.sieve
 
     ###
     ### Spam learning

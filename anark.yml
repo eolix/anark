@@ -27,6 +27,8 @@
 
 - name: Make sure all services are running
   hosts: all
+  become: true
+  become_user: root
   roles:
     - role: mailserver/restartenable
   tags: always
