@@ -42,7 +42,7 @@ Your MariaDB passwords will be saved locally on the `secret/*_db_password` direc
 
 
 ## Future plans / name
-The anarchic nature of the name means you'll be able to run all common third-party -rovided services on your own server, with open source software, on your own terms.
+The anarchic nature of the name means you'll be able to run all common third-party-provided services on your own server, with open source software, on your own terms.
 
 That means, in the future, you'll have:
 - VPN server with OpenVPN (ready soon)
