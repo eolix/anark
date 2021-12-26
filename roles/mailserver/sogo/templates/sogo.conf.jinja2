@@ -15,7 +15,8 @@
 
     // Daemon address and port
     WOPort = 127.0.0.1:20000;
-    WOWorkersCount = 100;
+    // WOWorkersCount below is managed in /etc/default/sogo with PREFORK
+    WOWorkersCount = 8;
     SxVMemLimit = 384;
     SOGoMaximumPingInterval = 3540;
     SOGoInternalSyncInterval = 45;
@@ -71,8 +72,8 @@
 
     // SMTP server
     SOGoMailingMechanism = smtp;
-    SOGoSMTPServer = 127.0.0.1;
-    //SOGoSMTPAuthenticationType = PLAIN;
+    SOGoSMTPServer = "smtp://{{ mail_domain }}:587/?tls=YES";
+    SOGoSMTPAuthenticationType = PLAIN;
 
     // Enable managesieve service
     //
