@@ -19,6 +19,13 @@
     dest: "/etc/nginx/sites-enabled/mail.{{ mail_domain }}"
     state: link
 
+- name: Configure safe SSL ciphers for nginx
+  lineinfile:
+    dest: "/etc/nginx/nginx.conf"
+    insertafter: 'ssl_prefer_server_ciphers'
+    line: "        ssl_ciphers ECDH+AESGCM:ECDH+AES256:ECDH+AES128:DH+3DES:!ADH:!AECDH:!MD5:!kDHE;"
+
+
 - name: Extract base website into /var/www/html
   unarchive:
     src: website.tar

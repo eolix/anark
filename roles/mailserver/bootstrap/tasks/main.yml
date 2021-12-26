@@ -1,4 +1,9 @@
 ---
+- name: Test if vault password can be decrypted
+  set_fact:
+    test_var_password: "{{ mail_password }}"
+  no_log: True
+
 - name: Update apt cache
   apt: update_cache=yes
 

@@ -1,16 +1,16 @@
 ---
 - name: Set root DB password, or generate a random one if it doesn't exist
   set_fact:
-    root_db_password: "{{ lookup('password', '' + secretpath + '/root_db_password length=32 chars=ascii_letters,digits') }}"
+    root_db_password: "{{ lookup('password', '' + secretpath + '/' + mail_domain + '_root_db_password length=32 chars=ascii_letters,digits') }}"
   no_log: True
 
 - name: Set vmail DB user password, or generate a random one if it doesn't exist
   set_fact:
-    vmail_db_password: "{{ lookup('password', '' + secretpath + '/vmail_db_password length=32 chars=ascii_letters,digits') }}"
+    vmail_db_password: "{{ lookup('password', '' + secretpath + '/' + mail_domain + '_vmail_db_password length=32 chars=ascii_letters,digits') }}"
   no_log: True
 
 - name: Set sogo DB user password, or generate a random one if it doesn't exist
   set_fact:
-    sogo_db_password: "{{ lookup('password', '' + secretpath + '/sogo_db_password length=32 chars=ascii_letters,digits') }}"
+    sogo_db_password: "{{ lookup('password', '' + secretpath + '/' + mail_domain + '_sogo_db_password length=32 chars=ascii_letters,digits') }}"
   no_log: True
   when: sogo | default('true')  == 'true'

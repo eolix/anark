@@ -19,6 +19,12 @@
     dest: /etc/sogo/sogo.conf
   no_log: True
 
+- name: Sogo increase WOWorkersCount from default of 3
+  lineinfile:
+    dest: /etc/default/sogo
+    line: "PREFORK=8"
+    state: present
+
 - name: Restart sogo services
   service:
     name: "{{ item }}"
