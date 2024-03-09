@@ -1,10 +1,11 @@
 ---
 mail_domain: mydomain.com # the 'mail' subdomain will be added throughout the playbook - don't add it here.
-mail_user: myname # the main e-mail account. Postmaster will be aliased to this account
+mail_user: hello # the main e-mail account. Postmaster will be aliased to this account
 mail_aliases: # optionally add more aliases to main account
-  - hello
+  - admin
+  - postmaster
 mail_password: changeme # use ansible vault for extra security
-mail_quota: 30000 # amount of available disk space for the main e-mail account
+mail_quota: 20000 # amount of available disk space in MB for the main e-mail account
 mail_storage: /var/mail # this will be the vmail home and where all emails will be stored
-
-secretpath: '{{ inventory_dir | realpath + "/secret" }}' # your passwords will be saved here
+webserver: false
+secretpath: '{{ inventory_dir | realpath + "/secret" }}'

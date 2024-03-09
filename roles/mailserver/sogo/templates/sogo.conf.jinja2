@@ -66,13 +66,13 @@
     // IMAP server
     // SOGoIMAPServer = "imaps://localhost:993/?tls=YES";
     // Local connection is considered as secure by Dovecot.
-    SOGoIMAPServer = "imaps://{{ mail_domain }}:993/";
+    SOGoIMAPServer = "imaps://{% if webserver == False %}mail.{% endif %}{{ mail_domain }}:993/";
 
-    SOGoMailDomain = {{ mail_domain }};
+    SOGoMailDomain = {% if webserver == False %}mail.{% endif %}{{ mail_domain }};
 
     // SMTP server
     SOGoMailingMechanism = smtp;
-    SOGoSMTPServer = "smtp://{{ mail_domain }}:587/?tls=YES";
+    SOGoSMTPServer = "smtp://{% if webserver == False %}mail.{% endif %}{{ mail_domain }}:587/?tls=YES";
     SOGoSMTPAuthenticationType = PLAIN;
 
     // Enable managesieve service

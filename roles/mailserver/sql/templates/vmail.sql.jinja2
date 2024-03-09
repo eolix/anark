@@ -50,4 +50,6 @@ VALUES
 {% endfor %}
 {% endif %}
 
+FLUSH PRIVILEGES;
+
 GRANT ALL ON vmail.* TO 'vmail'@'localhost' IDENTIFIED BY '{{ vmail_db_password }}';

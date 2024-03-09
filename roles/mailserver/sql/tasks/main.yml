@@ -43,6 +43,15 @@
   ignore_errors: true
   when: (dbstatus.stdout_lines) and (recreate_databases | default('false')  == 'true')
 
+#- name: Create vmail database
+#  command: mysql -e "CREATE DATABASE vmail" -sN
+#  when: (not dbstatus.stdout_lines) or (recreate_databases | default('false')  == 'true') 
+#
+#- name: Import vmail database
+#  command: mysql -u root -p {{ root_db_password }} vmail < /tmp/vmail.sql
+##  no_log: True
+#  when: (not dbstatus.stdout_lines) or (recreate_databases | default('false')  == 'true') 
+
 - name: Create vmail database
   mysql_db:
     login_unix_socket: /var/run/mysqld/mysqld.sock
@@ -57,9 +66,18 @@
     path: /tmp/vmail.sql
     state: absent
 
+#- name: Set DB vmail user password
+#  command: mysql --execute="FLUSH PRIVILEGES; SET PASSWORD FOR 'vmail'@'localhost' = PASSWORD('{{ vmail_db_password }}');"
+#  no_log: True
+
 - name: Set DB vmail user password
-  command: mysql --execute="SET PASSWORD FOR 'vmail'@'localhost' = PASSWORD('{{ vmail_db_password }}');"
-  no_log: True
+  mysql_user:
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    name: vmail
+    password: "{{ vmail_db_password }}"
+    state: present
+    host: localhost
+
 
 - block:
   - name: Copy SQL commands to run in new database
