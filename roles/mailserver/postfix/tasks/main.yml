@@ -22,6 +22,16 @@
     - mysql-virtual-alias-maps.cf
     - mysql-virtual-email2email.cf
 
+- name: Setup MailJet Relay
+  template:
+    src: "sasl_passwd.jinja2"
+    dest: "/etc/postfix/sasl_passwd"
+  when: mailjet | default('false') | bool
+
+- name: Generate MailJet credentials Hash
+  command: postmap /etc/postfix/sasl_passwd
+  when: mailjet | default('false') | bool
+
 - name: Copy Postfix master configuration
   copy:
     src: master.cf

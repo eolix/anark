@@ -10,7 +10,7 @@
 - name: Upgrade all safe packages
   apt: upgrade=safe
 
-- name: Install a list of packages
+- name: Install all required packages
   apt:
     state: present
     pkg:

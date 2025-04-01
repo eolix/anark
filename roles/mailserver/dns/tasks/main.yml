@@ -6,6 +6,7 @@
     - unbound
     - resolvconf
     - dnsutils
+    - unbound-anchor
 
 - name: Update DNSSEC Root key
   command: unbound-anchor -a /var/lib/unbound/root.key
@@ -27,3 +28,4 @@
     dest: /etc/resolvconf/resolv.conf.d/head
     line: "nameserver 127.0.0.1"
     state: present
+    create: true

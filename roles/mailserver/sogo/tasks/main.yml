@@ -1,4 +1,20 @@
 ---
+- name: Add Sogo/Axis repository key
+  when: ansible_distribution == 'Ubuntu'
+  apt:
+    deb: http://www.axis.cz/linux/debian/axis-archive-keyring.deb
+
+- name: Add Sogo/Axis repository
+  when: ansible_distribution == 'Ubuntu'
+  lineinfile:
+    path: /etc/apt/sources.list.d/sogo-axis.list
+    line: "deb http://www.axis.cz/linux/debian {{ ansible_distribution_release }} sogo-v5"
+    create: yes
+
+- name: Update apt cache
+  when: ansible_distribution == 'Ubuntu'
+  apt: update_cache=yes
+
 - name: Install Sogo packages
   apt:
     state: present

@@ -7,8 +7,8 @@
     - python3-pymysql
     - dovecot-core
 
-- name: Install PyMySQL with pip3
-  command: pip3 install PyMySQL
+#- name: Install PyMySQL with pip3
+#  command: pip3 install PyMySQL
 
 - name: Set MariaDB root user password
   command: mysql --execute="SET PASSWORD FOR 'root'@'localhost' = PASSWORD('{{root_db_password}}');"

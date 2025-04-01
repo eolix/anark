@@ -22,6 +22,11 @@
 
   - name: Run Certbot to generate all required SSL certificates
     command: "certbot certonly --standalone --rsa-key-size 4096 -d {{ mail_domain }} -d www.{{ mail_domain }} -d mail.{{ mail_domain }} -d smtp.{{ mail_domain }} -d imap.{{ mail_domain }} --non-interactive --agree-tos -m {{ mail_user }}@{{ mail_domain }}"
+    when: webserver | default(true) == true
+
+  - name: Run Certbot to generate all required SSL certificates
+    command: "certbot certonly --standalone --rsa-key-size 4096 -d mail.{{ mail_domain }} -d smtp.{{ mail_domain }} -d imap.{{ mail_domain }} --non-interactive --agree-tos -m {{ mail_user }}@{{ mail_domain }}"
+    when: webserver | default(true) == false
 
   - name: Restart web services
     service:
