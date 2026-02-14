@@ -1,0 +1,26 @@
+---
+- name: Install Fail2Ban package
+  ansible.builtin.package:
+    name: fail2ban
+    state: present
+
+- name: Create Fail2Ban configuration directory
+  ansible.builtin.file:
+    path: /etc/fail2ban
+    state: directory
+    mode: '0755'
+
+- name: Deploy Fail2Ban jail configuration
+  ansible.builtin.template:
+    src: jail.local.j2
+    dest: /etc/fail2ban/jail.local
+    mode: '0644'
+  notify: Restart Fail2Ban
+
+- name: Ensure Fail2Ban log file exists
+  ansible.builtin.file:
+    path: /var/log/fail2ban.log
+    state: touch
+    mode: '0644'
+    owner: root
+    group: root

@@ -37,6 +37,7 @@
     - telnet
     - gpg
     - gpg-agent
+    - libsasl2-modules
 
 - name: Change hostname
   hostname:

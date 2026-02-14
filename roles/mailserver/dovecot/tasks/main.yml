@@ -67,6 +67,12 @@
     owner: vmail
     group: dovecot
 
+- name: Generate DH parameters file
+  ansible.builtin.command:
+    cmd: openssl dhparam -out /etc/dovecot/dh.pem 2048
+    creates: /etc/dovecot/dh.pem
+  become: yes
+
 - name: Make sure dovecot configuration files have the correct permissions
   file:
     path: /etc/dovecot

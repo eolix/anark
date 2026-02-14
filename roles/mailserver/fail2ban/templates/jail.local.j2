@@ -1,0 +1,23 @@
+[DEFAULT]
+bantime  = {{ fail2ban_bantime | default(172800) }}
+findtime = {{ fail2ban_findtime | default(600) }}
+maxretry = {{ fail2ban_maxretry | default(5) }}
+action = %(action_)s
+
+[sshd]
+enabled = true
+port = ssh
+filter = sshd
+logpath = /var/log/auth.log
+bantime  = {{ fail2ban_bantime | default(172800) }}
+findtime = {{ fail2ban_findtime | default(600) }}
+maxretry = {{ fail2ban_maxretry | default(5) }}
+
+[postfix]
+enabled = true
+port = smtp,ssmtp,submission
+filter = postfix[mode=auth]
+logpath = /var/log/mail.log
+bantime  = {{ fail2ban_bantime | default(172800) }}
+findtime = {{ fail2ban_findtime | default(600) }}
+maxretry = {{ fail2ban_maxretry | default(5) }}

@@ -62,3 +62,10 @@
     state: restarted
     enabled: yes
   when: nginx | default('true') | bool
+
+- name: Restart and enable Fail2Ban service
+  service:
+    name: fail2ban
+    state: restarted
+    enabled: yes
+  when: fail2ban | default('false') | bool

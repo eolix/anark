@@ -24,6 +24,8 @@
       when: sogo | default('true') | bool
     - role: mailserver/nginx
       when: nginx | default('true') | bool
+    - role: mailserver/fail2ban
+      when: fail2ban | default('false') | bool
 
 - name: Make sure all services are running
   hosts: all
