@@ -8,8 +8,10 @@ enabled = true;
 allow_envfrom_empty = true;
 allow_hdrfrom_mismatch = false;
 allow_hdrfrom_multiple = false;
-auth_only = true;
+
+sign_authenticated = true;
 sign_local = true;
+
 symbol = "DKIM_SIGNED";
 try_fallback = false;
 use_domain = "header";
